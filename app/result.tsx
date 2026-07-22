@@ -27,27 +27,27 @@ export default function ResultScreen() {
       style={styles.screen}
       contentContainerStyle={styles.container}
       contentInsetAdjustmentBehavior="automatic">
-      <Text style={styles.title}>Letter Analysis</Text>
+      <Text style={styles.title}>信件分析结果</Text>
 
       {analysisData ? (
         <>
           <View style={styles.card}>
-            <Text style={styles.label}>Letter Type</Text>
+            <Text style={styles.label}>这是什么信？</Text>
             <Text style={styles.value}>{analysisData.letter_type}</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>What This Letter Says</Text>
+            <Text style={styles.label}>这封信在说什么？</Text>
             <Text style={styles.body}>{analysisData.summary}</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>Deadline</Text>
+            <Text style={styles.label}>截止日期：</Text>
             <Text style={styles.value}>{analysisData.deadline}</Text>
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>What You Need To Do</Text>
+            <Text style={styles.label}>您现在需要做什么？</Text>
             {analysisData.actions.map((action, index) => (
               <Text key={`${index}-${action}`} style={styles.listItem}>
                 • {action}
@@ -57,13 +57,13 @@ export default function ResultScreen() {
         </>
       ) : (
         <View style={styles.card}>
-          <Text style={styles.label}>Analysis Unavailable</Text>
-          <Text style={styles.body}>Please return home and analyze the letter again.</Text>
+          <Text style={styles.label}>暂时无法显示分析结果</Text>
+          <Text style={styles.body}>请返回首页，重新上传信件并再次分析。</Text>
         </View>
       )}
 
       <TouchableOpacity style={styles.button} onPress={() => router.replace('/')}>
-        <Text style={styles.buttonText}>Back to Home</Text>
+        <Text style={styles.buttonText}>返回首页</Text>
       </TouchableOpacity>
     </ScrollView>
   );

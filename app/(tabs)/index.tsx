@@ -23,8 +23,8 @@ export default function HomeScreen() {
 
     if (!permission.granted) {
       Alert.alert(
-        'Camera Permission Required',
-        'Please allow camera access to take a photo of your letter.'
+        '需要相机权限',
+        '请允许使用相机，以便拍摄需要分析的信件。'
       );
       return;
     }
@@ -96,13 +96,8 @@ export default function HomeScreen() {
         pathname: '/result',
         params: { analysis: JSON.stringify(analysis) },
       });
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'The letter could not be analyzed.';
-      Alert.alert(
-        'Analysis Failed',
-        `${message}\n\nCheck that the backend is running and API_BASE_URL uses your Mac's Wi-Fi IP address.`
-      );
+    } catch {
+      Alert.alert('分析失败', '暂时无法分析这封信，请稍后再试。');
     } finally {
       setIsAnalyzing(false);
     }
@@ -110,18 +105,16 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>AI Letter Helper</Text>
+      <Text style={styles.title}>AI信件助手</Text>
 
-      <Text style={styles.subtitle}>
-        Take a photo of your letter and get a clear Chinese explanation.
-      </Text>
+      <Text style={styles.subtitle}>看不懂英文信件？拍张照片，我们帮您用中文解释。</Text>
 
       <TouchableOpacity style={styles.primaryButton} onPress={takePhoto}>
-        <Text style={styles.primaryButtonText}>Take a Photo</Text>
+        <Text style={styles.primaryButtonText}>拍照</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.secondaryButton} onPress={chooseFromLibrary}>
-        <Text style={styles.secondaryButtonText}>Choose From Library</Text>
+        <Text style={styles.secondaryButtonText}>从相册选择</Text>
       </TouchableOpacity>
 
       {selectedImageUri && (
@@ -137,7 +130,7 @@ export default function HomeScreen() {
             onPress={analyzeLetter}
             disabled={isAnalyzing}>
             <Text style={styles.primaryButtonText}>
-              {isAnalyzing ? 'Analyzing...' : 'Analyze Letter'}
+              {isAnalyzing ? '正在分析，请稍候...' : '开始分析'}
             </Text>
           </TouchableOpacity>
         </>
