@@ -1,6 +1,38 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
+type FormFieldOption = {
+  original_text: string;
+  chinese_translation: string;
+  explanation: string;
+  is_selected: '是' | '否' | '无法判断';
+};
+
+type FormFieldGuidance = {
+  field_name: string;
+  chinese_name: string;
+  explanation: string;
+  example: string;
+  required_status: '必填' | '选填' | '无法判断';
+  page_number: number | null;
+  location_hint: string;
+  warning: string;
+  options: FormFieldOption[];
+};
+
+type FormGuidance = {
+  form_detected: '是' | '否' | '无法判断';
+  form_name: string;
+  general_instructions: string[];
+  fields: FormFieldGuidance[];
+  signature_required: '需要' | '不需要' | '无法判断';
+  signature_instructions: string;
+  documents_needed: string[];
+  return_methods: string[];
+  return_deadline: string;
+  important_warning: string;
+};
+
 type AnalysisResponse = {
   letter_type: string;
   importance: '高' | '中' | '低' | '无法判断';
@@ -14,6 +46,20 @@ type AnalysisResponse = {
   payment_required: '需要' | '不需要' | '无法判断';
   scam_risk: '未发现明显异常' | '存在可疑迹象' | '无法判断';
   scam_warning: string;
+  form_guidance: FormGuidance;
+};
+
+const defaultFormGuidance: FormGuidance = {
+  form_detected: '无法判断',
+  form_name: '未识别到明确表格名称',
+  general_instructions: [],
+  fields: [],
+  signature_required: '无法判断',
+  signature_instructions: '暂时无法判断是否需要签名。',
+  documents_needed: [],
+  return_methods: [],
+  return_deadline: '表格中未找到明确提交期限',
+  important_warning: '当前资料可能不完整，请检查是否还有其他页面。',
 };
 
 const importanceBadges: Record<AnalysisResponse['importance'], string> = {
@@ -22,6 +68,108 @@ const importanceBadges: Record<AnalysisResponse['importance'], string> = {
   低: '🟢 低',
   无法判断: '⚪ 无法判断',
 };
+
+function normalizeStringArray(value: unknown) {
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+}
+
+function normalizeFormGuidance(value: unknown): FormGuidance {
+  if (!value || typeof value !== 'object') {
+    return defaultFormGuidance;
+  }
+
+  const result = value as Partial<FormGuidance>;
+  const formDetected = ['是', '否', '无法判断'].includes(result.form_detected ?? '')
+    ? result.form_detected!
+    : '无法判断';
+  const signatureRequired = ['需要', '不需要', '无法判断'].includes(
+    result.signature_required ?? ''
+  )
+    ? result.signature_required!
+    : '无法判断';
+  const fields = Array.isArray(result.fields)
+    ? result.fields.flatMap((field): FormFieldGuidance[] => {
+        if (!field || typeof field !== 'object') {
+          return [];
+        }
+
+        const item = field as Partial<FormFieldGuidance>;
+        const requiredStatus = ['必填', '选填', '无法判断'].includes(item.required_status ?? '')
+          ? item.required_status!
+          : '无法判断';
+        const options = Array.isArray(item.options)
+          ? item.options.flatMap((option): FormFieldOption[] => {
+              if (!option || typeof option !== 'object') {
+                return [];
+              }
+
+              const choice = option as Partial<FormFieldOption>;
+              const isSelected = ['是', '否', '无法判断'].includes(choice.is_selected ?? '')
+                ? choice.is_selected!
+                : '无法判断';
+
+              return [
+                {
+                  original_text:
+                    typeof choice.original_text === 'string' && choice.original_text
+                      ? choice.original_text
+                      : '未识别到选项文字',
+                  chinese_translation:
+                    typeof choice.chinese_translation === 'string' && choice.chinese_translation
+                      ? choice.chinese_translation
+                      : '暂时无法翻译',
+                  explanation:
+                    typeof choice.explanation === 'string' ? choice.explanation : '',
+                  is_selected: isSelected,
+                },
+              ];
+            })
+          : [];
+
+        return [
+          {
+            field_name: typeof item.field_name === 'string' ? item.field_name : '',
+            chinese_name: typeof item.chinese_name === 'string' ? item.chinese_name : '',
+            explanation: typeof item.explanation === 'string' ? item.explanation : '',
+            example: typeof item.example === 'string' ? item.example : '',
+            required_status: requiredStatus,
+            page_number:
+              typeof item.page_number === 'number' && Number.isInteger(item.page_number)
+                ? item.page_number
+                : null,
+            location_hint: typeof item.location_hint === 'string' ? item.location_hint : '',
+            warning: typeof item.warning === 'string' ? item.warning : '',
+            options,
+          },
+        ];
+      })
+    : [];
+
+  return {
+    form_detected: formDetected,
+    form_name:
+      typeof result.form_name === 'string' && result.form_name
+        ? result.form_name
+        : defaultFormGuidance.form_name,
+    general_instructions: normalizeStringArray(result.general_instructions),
+    fields,
+    signature_required: signatureRequired,
+    signature_instructions:
+      typeof result.signature_instructions === 'string'
+        ? result.signature_instructions
+        : defaultFormGuidance.signature_instructions,
+    documents_needed: normalizeStringArray(result.documents_needed),
+    return_methods: normalizeStringArray(result.return_methods),
+    return_deadline:
+      typeof result.return_deadline === 'string' && result.return_deadline
+        ? result.return_deadline
+        : defaultFormGuidance.return_deadline,
+    important_warning:
+      typeof result.important_warning === 'string'
+        ? result.important_warning
+        : defaultFormGuidance.important_warning,
+  };
+}
 
 function normalizeAnalysis(value: unknown): AnalysisResponse | null {
   if (!value || typeof value !== 'object') {
@@ -68,6 +216,7 @@ function normalizeAnalysis(value: unknown): AnalysisResponse | null {
     scam_risk: scamRisk,
     scam_warning:
       typeof result.scam_warning === 'string' ? result.scam_warning : '当前资料不足，无法判断。',
+    form_guidance: normalizeFormGuidance(result.form_guidance),
   };
 }
 
@@ -150,6 +299,36 @@ export default function ResultScreen() {
               ))
             ) : (
               <Text style={styles.body}>目前没有需要完成的步骤。</Text>
+            )}
+          </View>
+
+          <View style={styles.card}>
+            <Text style={styles.label}>表格填写指导</Text>
+            {analysisData.form_guidance.form_detected === '否' ? (
+              <Text style={styles.body}>当前上传的页面中没有发现需要填写的表格。</Text>
+            ) : analysisData.form_guidance.form_detected === '无法判断' ? (
+              <Text style={styles.body}>
+                暂时无法确定是否包含表格，请确认已经上传清晰、完整的所有页面。
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.formName}>{analysisData.form_guidance.form_name}</Text>
+                <Text style={styles.formFieldCount}>
+                  共识别到 {analysisData.form_guidance.fields.length} 个栏目
+                </Text>
+                <TouchableOpacity
+                  style={styles.formGuidanceButton}
+                  onPress={() =>
+                    router.push({
+                      pathname: '/form-guidance',
+                      params: {
+                        formGuidance: JSON.stringify(analysisData.form_guidance),
+                      },
+                    })
+                  }>
+                  <Text style={styles.formGuidanceButtonText}>查看填写方法</Text>
+                </TouchableOpacity>
+              </>
             )}
           </View>
 
@@ -295,6 +474,31 @@ const styles = StyleSheet.create({
     lineHeight: 28,
     color: '#333333',
     marginBottom: 8,
+  },
+  formName: {
+    fontSize: 20,
+    lineHeight: 29,
+    fontWeight: '700',
+    color: '#222222',
+  },
+  formFieldCount: {
+    fontSize: 18,
+    lineHeight: 28,
+    color: '#555555',
+    marginTop: 6,
+  },
+  formGuidanceButton: {
+    minHeight: 52,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#111111',
+    marginTop: 16,
+  },
+  formGuidanceButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   attentionCard: {
     borderWidth: 2,
