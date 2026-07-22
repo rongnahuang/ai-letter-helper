@@ -38,6 +38,13 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow letter-helper to access your camera to photograph a letter.",
+          "microphonePermission": false
+        }
       ]
     ],
     "experiments": {
