@@ -1,8 +1,26 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+type Analysis = {
+  letter_type: string;
+  summary: string;
+  deadline: string;
+  actions: string[];
+};
 
 export default function ResultScreen() {
   const router = useRouter();
+  const { analysis } = useLocalSearchParams<{ analysis?: string | string[] }>();
+  const analysisParam = Array.isArray(analysis) ? analysis[0] : analysis;
+  let analysisData: Analysis | null = null;
+
+  if (analysisParam) {
+    try {
+      analysisData = JSON.parse(analysisParam) as Analysis;
+    } catch {
+      analysisData = null;
+    }
+  }
 
   return (
     <ScrollView
@@ -11,33 +29,38 @@ export default function ResultScreen() {
       contentInsetAdjustmentBehavior="automatic">
       <Text style={styles.title}>Letter Analysis</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Letter Type</Text>
-        <Text style={styles.value}>Medical Bill</Text>
-      </View>
+      {analysisData ? (
+        <>
+          <View style={styles.card}>
+            <Text style={styles.label}>Letter Type</Text>
+            <Text style={styles.value}>{analysisData.letter_type}</Text>
+          </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>What This Letter Says</Text>
-        <Text style={styles.body}>
-          This letter is asking you to pay a medical bill of $120.
-        </Text>
-      </View>
+          <View style={styles.card}>
+            <Text style={styles.label}>What This Letter Says</Text>
+            <Text style={styles.body}>{analysisData.summary}</Text>
+          </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Deadline</Text>
-        <Text style={styles.value}>August 15, 2026</Text>
-      </View>
+          <View style={styles.card}>
+            <Text style={styles.label}>Deadline</Text>
+            <Text style={styles.value}>{analysisData.deadline}</Text>
+          </View>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>What You Need To Do</Text>
-        <Text style={styles.listItem}>
-          • Check whether your insurance already paid part of the bill.
-        </Text>
-        <Text style={styles.listItem}>
-          • Call the billing department if the amount looks incorrect.
-        </Text>
-        <Text style={styles.listItem}>• Pay before the deadline to avoid late fees.</Text>
-      </View>
+          <View style={styles.card}>
+            <Text style={styles.label}>What You Need To Do</Text>
+            {analysisData.actions.map((action, index) => (
+              <Text key={`${index}-${action}`} style={styles.listItem}>
+                • {action}
+              </Text>
+            ))}
+          </View>
+        </>
+      ) : (
+        <View style={styles.card}>
+          <Text style={styles.label}>Analysis Unavailable</Text>
+          <Text style={styles.body}>Please return home and analyze the letter again.</Text>
+        </View>
+      )}
 
       <TouchableOpacity style={styles.button} onPress={() => router.replace('/')}>
         <Text style={styles.buttonText}>Back to Home</Text>

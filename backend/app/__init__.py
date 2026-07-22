@@ -1,0 +1,1 @@
+"""Letter Helper backend application."""
