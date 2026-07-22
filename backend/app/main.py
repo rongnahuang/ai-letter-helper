@@ -5,15 +5,24 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.models import AnalysisResponse
 from app.services.openai_service import (
+    LetterImage,
     MissingAPIKeyError,
     OpenAIAuthenticationError,
     OpenAIResponseError,
     OpenAIUnavailableError,
-    analyze_letter_image,
+    analyze_letter_images,
 )
 
 MAX_FILE_SIZE = 10 * 1024 * 1024
+MAX_FILES = 10
 READ_CHUNK_SIZE = 1024 * 1024
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/heic",
+    "image/heif",
+    "image/webp",
+}
 
 
 app = FastAPI(title="Letter Helper API", version="1.0.0")
@@ -35,53 +44,86 @@ async def health() -> dict[str, str]:
 
 
 @app.post("/api/v1/analyze", response_model=AnalysisResponse)
-async def analyze_letter(file: Annotated[UploadFile, File(...)]) -> AnalysisResponse:
-    if not file.content_type or not file.content_type.lower().startswith("image/"):
-        await file.close()
+async def analyze_letter(files: Annotated[list[UploadFile], File(...)]) -> AnalysisResponse:
+    if not files:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The uploaded file must be an image.",
+            detail="请至少上传一张图片。",
         )
 
-    image_data = bytearray()
+    if len(files) > MAX_FILES:
+        for file in files:
+            await file.close()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="每次最多可以上传10张图片。",
+        )
+
+    letter_images: list[LetterImage] = []
 
     try:
-        while chunk := await file.read(READ_CHUNK_SIZE):
-            image_data.extend(chunk)
-            if len(image_data) > MAX_FILE_SIZE:
+        for index, file in enumerate(files):
+            content_type = (file.content_type or "").strip().lower()
+
+            if content_type not in ALLOWED_IMAGE_TYPES:
                 raise HTTPException(
-                    status_code=status.HTTP_413_CONTENT_TOO_LARGE,
-                    detail="The uploaded image must be 10 MB or smaller.",
+                    status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+                    detail="其中一张图片格式不受支持。",
                 )
+
+            image_data = bytearray()
+
+            while chunk := await file.read(READ_CHUNK_SIZE):
+                image_data.extend(chunk)
+                if len(image_data) > MAX_FILE_SIZE:
+                    raise HTTPException(
+                        status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                        detail="每张图片必须小于或等于10 MB。",
+                    )
+
+            if not image_data:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="上传的图片不能为空。",
+                )
+
+            letter_images.append(
+                LetterImage(
+                    content=bytes(image_data),
+                    content_type=content_type,
+                    filename=file.filename or f"letter-page-{index + 1}",
+                )
+            )
     except HTTPException:
         raise
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="The uploaded image could not be read.",
+            detail="无法读取上传的图片。",
         ) from exc
     finally:
-        await file.close()
+        for file in files:
+            await file.close()
 
     try:
-        return await analyze_letter_image(bytes(image_data), file.content_type)
+        return await analyze_letter_images(letter_images)
     except MissingAPIKeyError as exc:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="The analysis service is not configured.",
+            detail="分析服务尚未配置。",
         ) from exc
     except OpenAIAuthenticationError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="The analysis service could not authenticate.",
+            detail="分析服务认证失败。",
         ) from exc
     except OpenAIUnavailableError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="The analysis service is temporarily unavailable.",
+            detail="分析服务暂时无法使用。",
         ) from exc
     except OpenAIResponseError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="The analysis service returned an invalid response.",
+            detail="分析服务返回了无效结果。",
         ) from exc
