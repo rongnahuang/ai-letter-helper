@@ -49,7 +49,7 @@ export default function PrivacyPolicyScreen() {
         <Text style={styles.updatedDate}>最后更新日期：2026年7月23日</Text>
 
         <Paragraph>
-          欢迎使用“AI信件助手”。本隐私政策说明您使用本应用时，我们如何处理您提供的信息。
+          欢迎使用“小鹿英文信件助手”。本隐私政策说明您使用本应用时，我们如何处理您提供的信息。
         </Paragraph>
 
         <Section title="一、我们处理的信息">
@@ -160,7 +160,7 @@ export default function PrivacyPolicyScreen() {
         <Section title="十二、联系我们">
           <Paragraph>如您对本隐私政策有疑问，请联系：</Paragraph>
           <View style={styles.placeholderCard}>
-            <Text style={styles.contactLine}>应用名称：AI信件助手</Text>
+            <Text style={styles.contactLine}>应用名称：小鹿英文信件助手</Text>
             <Text style={styles.placeholderLabel}>开发者或公司名称：</Text>
             <Text style={styles.placeholder}>While Loop HK Limited</Text>
             <Text style={styles.placeholderLabel}>联系邮箱：</Text>

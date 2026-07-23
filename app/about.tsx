@@ -32,7 +32,7 @@ export default function AboutScreen() {
         contentContainerStyle={styles.container}
         contentInsetAdjustmentBehavior="automatic">
         <View style={styles.appCard}>
-          <Text style={styles.appName}>AI信件助手</Text>
+          <Text style={styles.appName}>小鹿英文信件助手</Text>
           <Text style={styles.description}>
             帮助中文用户看懂英文信件、识别重要事项，并理解表格填写要求。
           </Text>

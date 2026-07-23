@@ -377,10 +377,19 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.heroSection}>
-        <Text style={styles.title}>AI信件助手</Text>
+        <View style={styles.titleRow}>
+          <Image
+            source={require('../../assets/logo/black-logo.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={styles.title} numberOfLines={1} adjustsFontSizeToFit>
+            小鹿英文信件助手
+          </Text>
+        </View>
 
         <Text style={styles.subtitle}>
-          看不懂英文信件？{'\n'}
+          看懂英文信件{'\n'}
           拍张照片，我们帮您用中文解释。
         </Text>
       </View>
@@ -500,14 +509,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginBottom: 40,
   },
-  title: {
+  titleRow: {
     width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 22,
+  },
+  logo: {
+    width: 38,
+    height: 38,
+    marginRight: 4,
+  },
+  title: {
     fontSize: 38,
     fontWeight: '700',
     lineHeight: 46,
-    textAlign: 'center',
     color: '#000000',
+    flexShrink: 1,
   },
   subtitle: {
     width: '100%',
