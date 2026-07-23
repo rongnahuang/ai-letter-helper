@@ -150,6 +150,25 @@ function BulletList({ items, emptyText }: { items: string[]; emptyText?: string 
   ));
 }
 
+function FillingDisclaimer({ onOpenDisclaimer }: { onOpenDisclaimer: () => void }) {
+  return (
+    <View style={styles.fillingDisclaimerCard}>
+      <Text style={styles.fillingDisclaimerTitle}>填写前请注意</Text>
+      <Text style={styles.fillingDisclaimerText}>
+        AI只负责解释栏目和选项，不会替您决定答案。请根据自己的真实情况填写，并在提交前检查原始表格的说明。
+      </Text>
+      <Text style={styles.fillingDisclaimerEmphasis}>不要签署空白或尚未填写完整的表格。</Text>
+      <TouchableOpacity
+        style={styles.disclaimerLink}
+        onPress={onOpenDisclaimer}
+        accessibilityRole="link"
+        accessibilityLabel="查看完整免责声明">
+        <Text style={styles.disclaimerLinkText}>查看完整免责声明</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export default function FormGuidanceScreen() {
   const router = useRouter();
   const { formGuidance } = useLocalSearchParams<{
@@ -165,6 +184,7 @@ export default function FormGuidanceScreen() {
         contentContainerStyle={styles.container}
         contentInsetAdjustmentBehavior="automatic">
         <Text style={styles.title}>暂时无法显示填写指导</Text>
+        <FillingDisclaimer onOpenDisclaimer={() => router.push('/disclaimer')} />
         <View style={styles.card}>
           <Text style={styles.body}>请返回分析结果，或重新上传清晰、完整的表格图片。</Text>
         </View>
@@ -188,9 +208,7 @@ export default function FormGuidanceScreen() {
         <Text style={styles.deadlineText}>{guidance.return_deadline}</Text>
       </View>
 
-      <View style={styles.noticeCard}>
-        <Text style={styles.noticeText}>请根据您自己的真实资料填写。AI不会替您决定或编造答案。</Text>
-      </View>
+      <FillingDisclaimer onOpenDisclaimer={() => router.push('/disclaimer')} />
 
       {guidance.fields.map((field, index) => {
         const location =
@@ -334,17 +352,46 @@ const styles = StyleSheet.create({
     color: '#7a5700',
     marginTop: 8,
   },
-  noticeCard: {
+  fillingDisclaimerCard: {
     padding: 20,
     borderRadius: 12,
-    backgroundColor: '#eaf3ff',
+    borderWidth: 1,
+    borderColor: '#9cb6d3',
+    backgroundColor: '#eef5fc',
     marginBottom: 16,
   },
-  noticeText: {
+  fillingDisclaimerTitle: {
+    fontSize: 20,
+    lineHeight: 29,
+    fontWeight: '700',
+    color: '#173b63',
+    marginBottom: 10,
+  },
+  fillingDisclaimerText: {
     fontSize: 18,
     lineHeight: 28,
-    fontWeight: '600',
-    color: '#163a63',
+    color: '#24496f',
+  },
+  fillingDisclaimerEmphasis: {
+    fontSize: 18,
+    lineHeight: 28,
+    fontWeight: '700',
+    color: '#173b63',
+    marginTop: 10,
+  },
+  disclaimerLink: {
+    minHeight: 48,
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    marginTop: 10,
+    paddingRight: 16,
+  },
+  disclaimerLinkText: {
+    fontSize: 18,
+    lineHeight: 27,
+    fontWeight: '700',
+    color: '#174f86',
+    textDecorationLine: 'underline',
   },
   card: {
     padding: 20,

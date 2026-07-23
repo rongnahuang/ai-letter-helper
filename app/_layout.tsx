@@ -18,6 +18,11 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="result" options={{ headerShown: false }} />
         <Stack.Screen name="form-guidance" options={{ headerShown: false }} />
+        <Stack.Screen name="history" options={{ title: '最近分析' }} />
+        <Stack.Screen name="settings" options={{ title: '设置' }} />
+        <Stack.Screen name="privacy-policy" options={{ title: '隐私政策' }} />
+        <Stack.Screen name="disclaimer" options={{ title: '免责声明' }} />
+        <Stack.Screen name="about" options={{ title: '关于应用' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
