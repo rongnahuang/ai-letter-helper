@@ -360,6 +360,20 @@ export default function HomeScreen() {
       ? '请先添加信件图片'
       : `开始分析${selectedImages.length}页信件`;
 
+  if (isAnalyzing) {
+    return (
+      <View style={styles.loadingScreen}>
+        <Image
+          source={require('../../assets/logo/black-logo.png')}
+          style={styles.loadingLogo}
+          resizeMode="contain"
+        />
+        <Text style={styles.loadingTitle}>小鹿正在阅读您的信件…</Text>
+        <Text style={styles.loadingMessage}>预计需要15–30秒。</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       style={styles.screen}
@@ -481,6 +495,32 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: '#ffffff',
+  },
+  loadingScreen: {
+    flex: 1,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+  },
+  loadingLogo: {
+    width: 88,
+    height: 88,
+    marginBottom: 28,
+  },
+  loadingTitle: {
+    fontSize: 24,
+    lineHeight: 34,
+    fontWeight: '700',
+    color: '#000000',
+    textAlign: 'center',
+  },
+  loadingMessage: {
+    marginTop: 14,
+    fontSize: 17,
+    lineHeight: 26,
+    color: '#666666',
+    textAlign: 'center',
   },
   container: {
     paddingHorizontal: 24,

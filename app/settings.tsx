@@ -1,7 +1,10 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import { Alert, Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { HAS_SEEN_ONBOARDING_KEY } from '@/constants/onboarding';
 
 const SUPPORT_EMAIL = 'admin@whileloophk.com';
 
@@ -44,12 +47,29 @@ export default function SettingsScreen() {
     }
   };
 
+  const restartOnboarding = async () => {
+    try {
+      await AsyncStorage.removeItem(HAS_SEEN_ONBOARDING_KEY);
+      router.replace('/onboarding');
+    } catch (error) {
+      if (__DEV__) {
+        console.error('[onboarding] reset failed:', error);
+      }
+      Alert.alert('暂时无法打开教程', '请稍后再试。');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screen} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.container}
         contentInsetAdjustmentBehavior="automatic">
         <View style={styles.card}>
+          <MenuItem
+            label="重新查看新手教程"
+            accessibilityLabel="重新查看新手教程"
+            onPress={() => void restartOnboarding()}
+          />
           <MenuItem
             label="隐私政策"
             accessibilityLabel="打开隐私政策"
