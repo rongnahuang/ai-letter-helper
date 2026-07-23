@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
@@ -356,33 +365,25 @@ export default function HomeScreen() {
       style={styles.screen}
       contentContainerStyle={styles.container}
       contentInsetAdjustmentBehavior="automatic">
-      <View style={styles.titleRow}>
-        <Text style={styles.title}>AI信件助手</Text>
-        <TouchableOpacity
+      <View style={styles.settingsRow}>
+        <Pressable
           style={styles.settingsButton}
           onPress={() => router.push('/settings')}
+          hitSlop={12}
           accessibilityRole="button"
           accessibilityLabel="打开设置">
           <MaterialIcons name="settings" size={28} color="#111111" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
-      <Text style={styles.subtitle}>看不懂英文信件？拍张照片，我们帮您用中文解释。</Text>
+      <View style={styles.heroSection}>
+        <Text style={styles.title}>AI信件助手</Text>
 
-      <TouchableOpacity
-        style={styles.historyButton}
-        onPress={() => router.push('/history')}
-        accessibilityRole="button"
-        accessibilityLabel="打开最近分析">
-        <View style={styles.historyButtonIcon}>
-          <MaterialIcons name="history" size={28} color="#174f86" />
-        </View>
-        <View style={styles.historyButtonTextContainer}>
-          <Text style={styles.historyButtonTitle}>最近分析</Text>
-          <Text style={styles.historyButtonSubtitle}>查看之前的信件分析结果</Text>
-        </View>
-        <MaterialIcons name="chevron-right" size={28} color="#666666" />
-      </TouchableOpacity>
+        <Text style={styles.subtitle}>
+          看不懂英文信件？{'\n'}
+          拍张照片，我们帮您用中文解释。
+        </Text>
+      </View>
 
       <TouchableOpacity style={styles.primaryButton} onPress={takePhoto}>
         <Text style={styles.primaryButtonText}>拍照</Text>
@@ -448,6 +449,21 @@ export default function HomeScreen() {
         disabled={isAnalyzing || selectedImages.length === 0}>
         <Text style={styles.primaryButtonText}>{analyzeButtonText}</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.historyButton}
+        onPress={() => router.push('/history')}
+        accessibilityRole="button"
+        accessibilityLabel="打开最近分析">
+        <View style={styles.historyButtonIcon}>
+          <MaterialIcons name="history" size={28} color="#174f86" />
+        </View>
+        <View style={styles.historyButtonTextContainer}>
+          <Text style={styles.historyButtonTitle}>最近分析</Text>
+          <Text style={styles.historyButtonSubtitle}>查看之前的信件分析结果</Text>
+        </View>
+        <MaterialIcons name="chevron-right" size={28} color="#666666" />
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -459,34 +475,46 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 40,
+    paddingTop: 8,
+    paddingBottom: 56,
     backgroundColor: '#ffffff',
   },
-  title: {
-    fontSize: 34,
-    fontWeight: '700',
-    flex: 1,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
+  settingsRow: {
+    width: '100%',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginTop: 8,
+    marginBottom: 52,
   },
   settingsButton: {
-    width: 48,
-    height: 48,
-    marginLeft: 12,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f1f1f1',
   },
+  heroSection: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    marginBottom: 40,
+  },
+  title: {
+    width: '100%',
+    marginBottom: 22,
+    fontSize: 38,
+    fontWeight: '700',
+    lineHeight: 46,
+    textAlign: 'center',
+    color: '#000000',
+  },
   subtitle: {
-    fontSize: 17,
-    lineHeight: 25,
-    marginBottom: 20,
+    width: '100%',
+    maxWidth: 330,
+    fontSize: 16,
+    lineHeight: 28,
+    textAlign: 'center',
     color: '#555555',
   },
   historyButton: {
@@ -499,7 +527,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f4f8fc',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 28,
+    marginTop: 48,
   },
   historyButtonIcon: {
     width: 44,
@@ -526,9 +554,11 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   primaryButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
+    width: '100%',
+    minHeight: 60,
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#111111',
     marginBottom: 14,
   },
@@ -538,12 +568,13 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   secondaryButton: {
-    paddingVertical: 16,
-    borderRadius: 12,
+    width: '100%',
+    minHeight: 60,
+    borderRadius: 20,
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#111111',
-    marginBottom: 24,
   },
   secondaryButtonText: {
     fontSize: 17,
@@ -555,16 +586,16 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     fontWeight: '600',
     color: '#222222',
-    marginBottom: 8,
+    marginTop: 48,
+    marginBottom: 20,
   },
   note: {
     fontSize: 16,
-    lineHeight: 24,
+    lineHeight: 28,
     color: '#555555',
-    marginBottom: 20,
   },
   previewSection: {
-    marginBottom: 20,
+    marginTop: 40,
   },
   previewHeader: {
     flexDirection: 'row',
@@ -647,7 +678,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     backgroundColor: '#111111',
-    marginTop: 4,
+    marginTop: 40,
   },
   disabledButton: {
     opacity: 0.6,

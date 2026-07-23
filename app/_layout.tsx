@@ -15,7 +15,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, title: '返回' }} />
         <Stack.Screen name="result" options={{ headerShown: false }} />
         <Stack.Screen name="form-guidance" options={{ headerShown: false }} />
         <Stack.Screen name="history" options={{ title: '最近分析' }} />
