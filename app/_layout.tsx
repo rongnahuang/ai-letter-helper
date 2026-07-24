@@ -137,7 +137,6 @@ export default function RootLayout() {
         <Stack.Screen name="privacy-policy" options={{ title: '隐私政策' }} />
         <Stack.Screen name="disclaimer" options={{ title: '免责声明' }} />
         <Stack.Screen name="about" options={{ title: '关于应用' }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

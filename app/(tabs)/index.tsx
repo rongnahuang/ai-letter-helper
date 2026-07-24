@@ -403,8 +403,7 @@ export default function HomeScreen() {
         </View>
 
         <Text style={styles.subtitle}>
-          看懂英文信件{'\n'}
-          拍张照片，我们帮您用中文解释。
+          拍照上传，一分钟看懂英文信件
         </Text>
       </View>
 
@@ -473,7 +472,7 @@ export default function HomeScreen() {
         <Text style={styles.primaryButtonText}>{analyzeButtonText}</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.historyButton}
         onPress={() => router.push('/history')}
         accessibilityRole="button"
@@ -486,7 +485,7 @@ export default function HomeScreen() {
           <Text style={styles.historyButtonSubtitle}>查看之前的信件分析结果</Text>
         </View>
         <MaterialIcons name="chevron-right" size={28} color="#666666" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollView>
   );
 }
@@ -576,42 +575,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#555555',
   },
-  historyButton: {
-    minHeight: 72,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#c9d8e8',
-    backgroundColor: '#f4f8fc',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 48,
-  },
-  historyButtonIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#e5eff9',
-    marginRight: 12,
-  },
-  historyButtonTextContainer: {
-    flex: 1,
-  },
-  historyButtonTitle: {
-    fontSize: 19,
-    lineHeight: 27,
-    fontWeight: '700',
-    color: '#111111',
-  },
-  historyButtonSubtitle: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#555555',
-    marginTop: 2,
-  },
+  // historyButton: {
+  //   minHeight: 72,
+  //   paddingHorizontal: 16,
+  //   paddingVertical: 12,
+  //   borderRadius: 12,
+  //   borderWidth: 1,
+  //   borderColor: '#c9d8e8',
+  //   backgroundColor: '#f4f8fc',
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   marginTop: 48,
+  // },
+
+  // historyButtonTextContainer: {
+  //   flex: 1,
+  // },
+  // historyButtonTitle: {
+  //   fontSize: 19,
+  //   lineHeight: 27,
+  //   fontWeight: '700',
+  //   color: '#111111',
+  // },
+  // historyButtonSubtitle: {
+  //   fontSize: 16,
+  //   lineHeight: 24,
+  //   color: '#555555',
+  //   marginTop: 2,
+  // },
   primaryButton: {
     width: '100%',
     minHeight: 60,
